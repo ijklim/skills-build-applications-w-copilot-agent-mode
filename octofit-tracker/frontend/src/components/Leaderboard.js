@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+// Example Codespace URL: https://$REACT_APP_CODESPACE_NAME-8000.app.github.dev/api/leaderboard/
+
 function buildUrl(endpoint) {
   const codespace = process.env.REACT_APP_CODESPACE_NAME;
   if (codespace) return `https://${codespace}-8000.app.github.dev/api/${endpoint}/`;
