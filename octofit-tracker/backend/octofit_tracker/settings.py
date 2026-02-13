@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -7,7 +8,12 @@ SECRET_KEY = 'dev-secret-key'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+CODESPACE_NAME = os.environ.get('CODESPACE_NAME')
+_allowed_hosts = ['localhost', '127.0.0.1']
+if CODESPACE_NAME:
+    _allowed_hosts.append(f"{CODESPACE_NAME}-8000.app.github.dev")
+
+ALLOWED_HOSTS = _allowed_hosts
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
@@ -24,7 +30,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djongo',
     'corsheaders',
-    'tracker',
+    'octofit_tracker.tracker',
 ]
 
 MIDDLEWARE = [
@@ -58,19 +64,31 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'octofit_tracker.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'octofit_db',
-        'CLIENT': {
-            'host': 'localhost',
-            'port': 27017,
-            'username': '',
-            'password': '',
-            'authSource': '',
+# Use SQLite for local development to avoid requiring MongoDB.
+# Set USE_SQLITE=0 to use the djongo (MongoDB) backend instead.
+USE_SQLITE = os.environ.get('USE_SQLITE', '1') == '1'
+
+if USE_SQLITE:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'djongo',
+            'NAME': 'octofit_db',
+            'CLIENT': {
+                'host': 'localhost',
+                'port': 27017,
+                'username': '',
+                'password': '',
+                'authSource': '',
+            }
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = []
 

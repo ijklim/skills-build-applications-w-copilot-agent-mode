@@ -3,5 +3,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('tracker.urls')),
+    path('api/', include('octofit_tracker.tracker.urls')),
+    path('', include('octofit_tracker.tracker.urls')),
 ]

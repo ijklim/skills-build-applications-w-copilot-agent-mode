@@ -1,3 +1,4 @@
+import os
 from django.urls import path, include
 from rest_framework import routers
 from rest_framework.response import Response
@@ -20,7 +21,20 @@ router.register(r'leaderboard', LeaderboardEntryViewSet)
 
 @api_view(['GET'])
 def api_root(request):
-    return Response({'api': request.build_absolute_uri('')})
+    codespace = os.environ.get('CODESPACE_NAME')
+    if codespace:
+        api_base = f"https://{codespace}-8000.app.github.dev/api/"
+    else:
+        root = request.build_absolute_uri('/')
+        api_base = root.rstrip('/') + '/api/'
+
+    return Response({
+        'users': api_base + 'users/',
+        'teams': api_base + 'teams/',
+        'activities': api_base + 'activities/',
+        'workouts': api_base + 'workouts/',
+        'leaderboard': api_base + 'leaderboard/',
+    })
 
 
 urlpatterns = [
